@@ -1,6 +1,6 @@
 <?php
 return array(
-	
+	'APP_GROUP_LIST' => 'Api,Web',
 	'DEFAULT_MODULE' =>	'Api',
 	'URL_MODEL'      =>	1,
 
@@ -17,7 +17,7 @@ return array(
 	/* Redis设置*/
 	'REDIS_HOST'          =>  '127.0.0.1',
 	'REDIS_PORT'          =>  '6379',
-	'REDIS_CTYPE'         => 1, //连接类型 1:普通连接 2:长连接  
+	'REDIS_CTYPE'         => 1, //连接类型 1:普通连接 2:长连接
 	'REDIS_TIMEOUT'       => 0, //连接超时时间(S) 0:永不超时
 
 	'DATA_CACHE_TIME'     => 0,      // 数据缓存有效期 0表示永久缓存
@@ -25,7 +25,7 @@ return array(
 	'DATA_CACHE_CHECK'    => false,   // 数据缓存是否校验缓存
 	'DATA_CACHE_PREFIX'   => '',     // 缓存前缀
 	'DATA_CACHE_TYPE'     => 'Redis',  // 数据缓存类型,
-		
+
 	//开启字段映射机制
 	'READ_DATA_MAP'	  =>  true,
 
