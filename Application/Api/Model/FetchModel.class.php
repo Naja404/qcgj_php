@@ -249,6 +249,7 @@ class FetchModel extends Model{
 		foreach ($data as $k => $v) {
 			$v['shopmall_id'] = (int)$shopmallID;
 			$v['name_s'] = $this->pregBracket($v['name']);
+			$v['mark'] = 2;
 
 			if ($this->existsShop($v)) {
 				$err = array(
@@ -285,9 +286,9 @@ class FetchModel extends Model{
 	 */
 	public function getShopMall(){
 
-		// $where = array(
-		// 		'id' => array('egt', '471'),
-		// 	);
+		$where = array(
+				'mark' => 1,
+			);
 		return $this->table(tname('fetch_shopmall_detail'))->where($where)->group('url')->order('id ASC')->select();
 	}
 
@@ -568,15 +569,18 @@ class FetchModel extends Model{
 	public function setBrandCache(){
 
 		$sql = "select
-				a.name_s as name_zh,
-				a.floor,
-				c.id as tb_mall_id,
-				d.id as tb_category_id
-				from tb_fetch_shop as a
-				left join tb_fetch_shopmall_detail as b on b.id = shopmall_id
-				left join qcgj_mall as c on c.name_zh = b.name_s and c.address = b.address_s
-				left join qcgj_category as d on d.name = a.categary_name
-				where a.shopmall_id in (351,325,222,358,371,398,374,326,345,376,194,141,372,342,82,143,375,588,583,591,397,587,150,195,266)  group by a.url";
+						a.id,
+						a.name_s as name_zh,
+						a.floor,
+						d.id as tb_category_id,
+						b.uuid as tb_mall_id
+					 from
+					tb_fetch_shop as a
+					left join tb_fetch_shopmall_detail as b on  b.id = a.shopmall_id
+					left join qcgj_mall as c on c.address = b.address_s
+					left join `qcgj_category` as d on d.name = a.categary_name
+					where a.mark = 2
+					group by a.url";
 				$brandList = $this->query($sql);
 		// $brandList = $this->query('select
 		// 								a.id,
