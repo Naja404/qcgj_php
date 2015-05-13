@@ -87,7 +87,7 @@
 													</tr>
 												</thead>
 
-												<tbody>
+<!-- 												<tbody>
 												<volist name="couponList" id="item">
 													<tr>
 														<td class="center">
@@ -159,7 +159,7 @@
 														</td>
 													</tr>
 												</volist>
-												</tbody>
+												</tbody> -->
 											</table>
 										</div>
 									</div>
@@ -221,12 +221,18 @@
 
 		<script type="text/javascript">
 			jQuery(function($) {
-				var oTable1 = $('#sample-table-2').dataTable( {
-				"aoColumns": [
-			      { "bSortable": false },
-			      null, null,null, null, null,
-				  { "bSortable": false }
-				] } );
+				// var oTable1 = $('#sample-table-2').dataTable( {
+				// "aoColumns": [
+			 //      { "bSortable": false },
+			 //      null, null,null, null, null,
+				//   { "bSortable": false }
+				// ] } );
+
+				var oTable1 = $('#sample-table-2').dataTable({
+					'bServerSide': true,
+					// 'serverSid' : true,
+					'sAjaxSource' : '<?php echo U("Coupon/ajaxCouponList");?>'
+				});
 
 
 				$('table th input:checkbox').on('click' , function(){

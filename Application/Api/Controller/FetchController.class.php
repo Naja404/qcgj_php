@@ -9,7 +9,7 @@ use Model\Fetch;
 
 class FetchController extends Controller {
 	// 默认城市id 1=上海,2=北京,4=广州,7=深圳
-	const CITY_ID = 4;
+	const CITY_ID = 3;
 	const CITY_ID_UUID = 'bf98a329000211e4b2bf00163e000dce';
 	const DOMAIN_URL = 'm.dianping.com';
 
@@ -29,8 +29,7 @@ class FetchController extends Controller {
 	 *
 	 */
 	protected function _initialize(){
-		echo 'false';
-		return false;
+
 		import('Extend.FetchHTML');
 
 		$this->fetchModel = D('Fetch');
@@ -59,6 +58,7 @@ class FetchController extends Controller {
 	 */
     public function setupShopMallCache(){
 		$shopMall = $this->fetchModel->getShopMall();
+
 		foreach ($shopMall as $k => $v) {
 			$v['round_info'] = json_decode($v['round_info'], true);
 			$status = cacheList(C('FETCH_INFO.CACHE_SHOPLIST'), $v);
@@ -93,20 +93,33 @@ class FetchController extends Controller {
 
 		// $res = cacheList('Fetch:List:shopMall', array('id' => 209, 'url' => '/shopping/malllist/c2r27615'));exit();
 
-		$cacheRes = cacheList(C('FETCH_INFO.CACHE_SHOPMALL'));
+		// $cacheRes = cacheList(C('FETCH_INFO.CACHE_SHOPMALL'));
 
-		if (!is_array($cacheRes)) {
-			return false;
-		}
+		// if (!is_array($cacheRes)) {
+		// 	return false;
+		// }
 
-		$filePath = C('FETCH_INFO.FILE_PATH').$cacheRes['url'].'.log';
-		$this->downloadHTML($this->domain.$cacheRes['url'], $filePath);
+		// $filePath = C('FETCH_INFO.FILE_PATH').$cacheRes['url'].'.log';
+		// $this->downloadHTML($this->domain.$cacheRes['url'], $filePath);
 
-		$mallRes = $this->fetch->fetch($filePath, 'shopMallList');
+		// $mallRes = $this->fetch->fetch($filePath, 'shopMallList');
+
+		$mallRes = array(
+					// '/shop/5736189',
+					// '/shop/2503993',
+					// '/shop/4298929',
+					// '/shop/9033118',
+					// '/shop/4530331',
+					// '/shop/21074577',
+					'/shop/4500489',
+			);
 
 		foreach ($mallRes as $k => $v) {
-			$fileName = C('FETCH_INFO.FILE_PATH').$v['url'].'.log';
-			$this->downloadHTML($this->domain.$v['url'], $fileName);
+
+			// $fileName = C('FETCH_INFO.FILE_PATH').$v['url'].'.log';
+			$fileName = C('FETCH_INFO.FILE_PATH').$v.'.log';
+			// $this->downloadHTML($this->domain.$v['url'], $fileName);
+			$this->downloadHTML($this->domain.$v, $fileName);
 
 			$this->shopMallDetail($fileName, $cacheRes['id']);
 		}
@@ -126,7 +139,12 @@ class FetchController extends Controller {
 
 		$this->downloadHTML($this->domain.$fetchRes['map'], $mapFilePath);
 		$fetchRes['location'] = $this->fetch->fetch($mapFilePath, 'shopLocation');
+
 		$fetchRes['cid'] = $pid;
+
+		$fetchRes['new_round'] = json_encode($fetchRes['round_info']);
+		echo '<pre>';
+		print_r($fetchRes);exit;
 
 		return $this->fetchModel->addShopMallDetail($fetchRes);
 	}
@@ -312,14 +330,24 @@ class FetchController extends Controller {
 	}
 
 	/**
-	 * 商圈入库
+	 * 品牌缓存数据 爬虫数据
 	 *
 	 */
-	public function setShopMall(){
+	public function setBrandCache(){
+		$this->fetchModel->setBrandCache();
+	}
+
+	/**
+	 * 品牌 爬虫数据合并到qcgj
+	 *
+	 */
+	public function setupBrand(){
 		$num = 1;
 
-		while ($num <= 1000) {
+		while ($num <= 500) {
 			$cacheRes = cacheList(C('FETCH_INFO.CACHE_BRAND'));
+			// $cacheRes = json_decode('{"id":"52580","name_zh":"\u9999\u5982\u653e\u7f8e\u98df","floor":"B1\n","tb_category_id":"c67b6f6f4437feb7460d1576ad6788de","tb_mall_id":"8202645e77796dc5ce4492068b07b8bc"}', true);
+
 
 			if (!is_array($cacheRes) || count($cacheRes) <= 0) {
 				echo 'no data';exit;
@@ -329,6 +357,46 @@ class FetchController extends Controller {
 			$num++;
 		}
 
+	}
+
+	/**
+	 * 商区分类 爬虫数据合并到qcgj
+	 *
+	 */
+	public function setTradeArea(){
+		$res = $this->fetchModel->setupShopMallArea();
+		echo '<pre>';
+		print_r($res);exit;
+	}
+
+	/**
+	 * 品牌分类 爬虫数据合并到qcgj
+	 *
+	 */
+	public function setupBrandCategory(){
+		$res = $this->fetchModel->setupBrandCategory();
+		echo '<pre>';
+		print_r($res);exit;
+	}
+
+	/**
+	 * 商厦 爬虫数据合并到qcgj
+	 *
+	 */
+	public function setupShopMall(){
+		$res = $this->fetchModel->setupShopMall();
+		echo '<pre>';
+		print_r($res);exit;
+	}
+
+	/**
+	 * 筛选品牌信息
+	 *
+	 */
+	public function filterBrand(){
+		$brandList = $this->fetchModel->filterBrand();
+		echo '<pre>';
+		print_r($brandList);exit;
 	}
 
 	/**
@@ -354,6 +422,10 @@ class FetchController extends Controller {
 		import('Extend.Snoopy');
 		$this->snoopy = new \Snoopy();
 		$this->snoopy->cookies['cityid'] = self::CITY_ID;
+		$this->snoopy->cookies['PHOENIX_ID'] = '0a010e1c-14d4c764622-493dc7';
+		$this->snoopy->cookies['m_flash2'] = 1;
+		$this->snoopy->cookies['pvhistory'] = '6L+U5ZuePjo8L3Nob3AvNTczNjE4OT46PDE0MzE1MDY4OTcxMjJdX1s=';
+		$this->snoopy->cookies['testName'] = 'test2';
 		$this->snoopy->host = self::DOMAIN_URL;
 		$this->snoopy->agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36';
 

@@ -6,16 +6,22 @@ namespace Api\Model;
 use Think\Model;
 
 class FetchModel extends Model{
-	
+
 	protected $autoCheckFields = false;
-	
+
+	protected $city_name = array(
+					'391db7b8fdd211e3b2bf00163e000dce' => '上海',
+					'bd21203d001c11e4b2bf00163e000dce' => '北京',
+					'bf98a329000211e4b2bf00163e000dce' => '广州',
+			);
+
 	/**
 	 * 添加优惠券分类
 	 * @param array $data 优惠券分类数据
 	 * @param string $sourceTyep 数据来源 DianPing=大众点评
 	 */
 	public function addCouponCate($data = array(), $sourceType = 'DianPing'){
-		
+
 		if (count($data) <= 0) {
 			return false;
 		}
@@ -56,7 +62,7 @@ class FetchModel extends Model{
 		}
 
 		foreach ($data as $k => $v) {
-			
+
 			if ($this->existsSaleInfo($v)) {
 				$data['dataErrNum'] = $v['url'];
 				errLog($data);
@@ -87,7 +93,7 @@ class FetchModel extends Model{
 					'url'     => $v,
 					'created' => date('Y-m-d H:i:s'),
 				);
-			
+
 			cacheList(C('FETCH_INFO.CACHE_SALE_LAST'), $cacheArr);
 
 			unset($cacheArr);
@@ -139,7 +145,7 @@ class FetchModel extends Model{
 				);
 
 			if ($this->existsSaleShop($saleShop)) {
-				
+
 				$err = array(
 						'dataErrNum' => 'exists sale shop',
 						'data'       => $saleShop,
@@ -168,7 +174,7 @@ class FetchModel extends Model{
 	 * @param array $data 商圈数组
 	 * @param string  $sourceType 来源标识 大众点评='DianPing', 美团="MeiTuan"
 	 * @param string $cityID 城市id uuid
-	 * @return bool 
+	 * @return bool
 	 */
 	public function addShopMallCate($data = array(), $sourceType = 'DianPing', $cityID = '391db7b8fdd211e3b2bf00163e000dce'){
 
@@ -180,7 +186,7 @@ class FetchModel extends Model{
 					'url'    => $v['url'],
 					'source' => $sourceType,
 				);
-			
+
 			$pid = $this->_addShopMallCate($parentData);
 
 			foreach ($v['data'] as $j => $m) {
@@ -204,7 +210,7 @@ class FetchModel extends Model{
 	 * @param array $data 商圈详细数据内容
 	 */
 	public function addShopMallDetail($data = array()){
-		
+
 		if ($this->existsShopMall($data)) {
 			$err = array(
 					'dataErrNum' => 'FetchModel/210',
@@ -239,7 +245,7 @@ class FetchModel extends Model{
 	 * @return bool
 	 */
 	public function addShop($data = array(), $shopmallID = 0){
-		
+
 		foreach ($data as $k => $v) {
 			$v['shopmall_id'] = (int)$shopmallID;
 			$v['name_s'] = $this->pregBracket($v['name']);
@@ -278,9 +284,10 @@ class FetchModel extends Model{
 	 *
 	 */
 	public function getShopMall(){
-		$where = array(
-				'id' => array('egt', '471'),
-			);
+
+		// $where = array(
+		// 		'id' => array('egt', '471'),
+		// 	);
 		return $this->table(tname('fetch_shopmall_detail'))->where($where)->group('url')->order('id ASC')->select();
 	}
 
@@ -290,7 +297,7 @@ class FetchModel extends Model{
 	 * @return bool
 	 */
 	public function existsSaleInfo($data = array()){
-		
+
 		$where = array(
 				'url'         => $data['url'],
 				'shopContent' => $data['shopContent'],
@@ -445,7 +452,7 @@ class FetchModel extends Model{
 	 *
 	 */
 	public function setupShopMallArea(){
-		$oldShopMallArea = $this->table(tname('fetch_shopmall'))->where('pid != 0 and id > 102')->select();
+		$oldShopMallArea = $this->table(tname('fetch_shopmall'))->where('pid != 0')->group('url')->select();
 
 		$success = $failed = 0;
 
@@ -457,7 +464,7 @@ class FetchModel extends Model{
 					'create_time'   => date('Y-m-d H:i:s'),
 					'update_time'   => date('Y-m-d H:i:s'),
 					'tb_city_id'    => $v['city_id'],
-					'city_name'     => $v['city_id'] == 'bd21203d001c11e4b2bf00163e000dce' ? '北京' : '广州',
+					'city_name'     => $this->city_name[$v['city_id']],
 				);
 
 			$id = $this->table('qcgj_trade_area')->add($add);
@@ -480,7 +487,26 @@ class FetchModel extends Model{
 	 *
 	 */
 	public function setupShopMall(){
-		$oldShopMall = $this->table('tb_fetch_shopmall_detail a, tb_fetch_shopmall b')->where('a.cid = b.id AND b.id > 103')->select();
+		// $where = array(
+		// 		'a.name_s' => array('neq', ''),
+		// 		'a.url' => array('neq', ''),
+		// 		'a.cid' => array('eq', 'b.id'),
+		// 	);
+		// $oldShopMall = $this->table('tb_fetch_shopmall_detail a, tb_fetch_shopmall b')
+		// 					->where($where)
+		// 					->group('a.url')
+		// 					->select();
+
+		$sql = "SELECT a.name_s,
+					   a.cid,
+					   a.address_s,
+					   a.lng,
+					   a.lat,
+					   b.name as t_name,
+					   b.city_id,
+					   b.uuid
+					FROM tb_fetch_shopmall_detail a,tb_fetch_shopmall b WHERE a.name_s <> '' AND a.url <> '' AND a.cid = b.id GROUP BY a.url";
+		$oldShopMall = $this->query($sql);
 
 		foreach ($oldShopMall as $k => $v) {
 			$add = array(
@@ -490,9 +516,9 @@ class FetchModel extends Model{
 					'create_time'      => date('Y-m-d H:i:s'),
 					'update_time'      => date('Y-m-d H:i:s'),
 					'tb_trade_area_id' => $v['uuid'],
-					'trade_area_name'  => $v['name'],
+					'trade_area_name'  => $v['t_name'],
 					'tb_city_id'       => $v['city_id'],
-					'city_name'        => $v['city_id'] == 'bd21203d001c11e4b2bf00163e000dce' ? '北京' : '广州',
+					'city_name'        => $this->city_name[$v['city_id']],
 					'longitude'        => $v['lng'],
 					'latitude'         => $v['lat'],
 					'open_time'        => '10:00',
@@ -501,7 +527,7 @@ class FetchModel extends Model{
 
 			$id = $this->table('qcgj_mall')->add($add);
 			$this->table(tname('fetch_shopmall_detail'))->where(array('id' => $v['id']))->save(array('uuid' => $add['id']));
-			$id ? $success++ : $failed++;	
+			$id ? $success++ : $failed++;
 		}
 
 		$returnRes = array(
@@ -540,19 +566,30 @@ class FetchModel extends Model{
 	}
 
 	public function setBrandCache(){
-		$brandList = $this->query('select 
-									a.id,
-									a.name_s as name_zh,
-									a.floor,
-									b.id as tb_category_id,
-									d.id as tb_mall_id
-									 from 
-									tb_fetch_shop as a
-									left join qcgj_category as b on b.name = a.categary_name
-									left join tb_fetch_shopmall_detail as c on c.id = a.shopmall_id
-									left join qcgj_mall as d on d.name_zh = c.name_s 
-									where c.cid >= 103
-									group by a.id');
+
+		$sql = "select
+				a.name_s as name_zh,
+				a.floor,
+				c.id as tb_mall_id,
+				d.id as tb_category_id
+				from tb_fetch_shop as a
+				left join tb_fetch_shopmall_detail as b on b.id = shopmall_id
+				left join qcgj_mall as c on c.name_zh = b.name_s and c.address = b.address_s
+				left join qcgj_category as d on d.name = a.categary_name
+				where a.shopmall_id in (351,325,222,358,371,398,374,326,345,376,194,141,372,342,82,143,375,588,583,591,397,587,150,195,266)  group by a.url";
+				$brandList = $this->query($sql);
+		// $brandList = $this->query('select
+		// 								a.id,
+		// 								a.name_s as name_zh,
+		// 								a.floor,
+		// 								d.id as tb_category_id,
+		// 								c.id as tb_mall_id
+		// 							 from
+		// 							tb_fetch_shop as a
+		// 							left join tb_fetch_shopmall_detail as b on  b.id = a.shopmall_id
+		// 							left join qcgj_mall as c on c.address = b.address_s
+		// 							left join `qcgj_category` as d on d.name = a.categary_name
+		// 							group by a.url');
 
 		foreach ($brandList as $k => $v) {
 			cacheList(C('FETCH_INFO.CACHE_BRAND'), $v);
@@ -567,7 +604,7 @@ class FetchModel extends Model{
 		$v = $brandList;
 
 		$brandID = $this->existsBrand($v['name_zh']);
-		
+
 		$brand = array(
 				'name_zh'     => $v['name_zh'],
 				'create_time' => date('Y-m-d H:i:s'),
@@ -596,7 +633,7 @@ class FetchModel extends Model{
 					'tb_category_id' => $v['tb_category_id'],
 				);
 
-			if (!$this->existsBrandCate($brandCate)) {
+			if ($this->existsBrandCate($brandCate) === false) {
 				$brandCateID = $this->table('qcgj_brand_category')->add($brandCate);
 			}
 
@@ -606,10 +643,10 @@ class FetchModel extends Model{
 					'tb_mall_id'  => $v['tb_mall_id'],
 					'create_time' => date('Y-m-d H:i:s'),
 					'update_time' => date('Y-m-d H:i:s'),
-					'address'     => $v['floor'],
+					'address'     => trim($v['floor']),
 				);
-			
-			if (!$this->existsBrandMall($brandMall)) {
+
+			if ($this->existsBrandMall($brandMall) === false) {
 				$brandMallID = $this->table('qcgj_brand_mall')->add($brandMall);
 			}
 		}
@@ -628,13 +665,13 @@ class FetchModel extends Model{
 
 	/**
 	 * 检测品牌分类是否存在
-	 * @param string $brandCate 
+	 * @param string $brandCate
 	 */
 	public function existsBrandCate($brandCate = array()){
 		if (!$brandCate) {
 			return false;
 		}
-		
+
 		$where = array(
 				'tb_brand_id'    => $brandCate['tb_brand_id'],
 				'tb_category_id' => $brandCate['tb_category_id'],
@@ -647,13 +684,13 @@ class FetchModel extends Model{
 
 	/**
 	 * 检测分类是否存在
-	 * @param string $brandCate 
+	 * @param string $brandCate
 	 */
 	public function existsCate($brandCate = array()){
 		if (!$brandCate) {
 			return false;
 		}
-		
+
 		$where = array(
 				'name'    => $brandCate['name'],
 			);
@@ -685,7 +722,7 @@ class FetchModel extends Model{
 		if (!$brandMall) {
 			return false;
 		}
-		
+
 		$where = array(
 				'tb_brand_id' => $brandMall['tb_brand_id'],
 				'tb_mall_id'  => $brandMall['tb_mall_id'],
@@ -694,6 +731,28 @@ class FetchModel extends Model{
 		$count = $this->table('qcgj_brand_mall')->where($where)->count();
 
 		return $count > 0 ? true : false;
+	}
+
+	public function filterBrand(){
+		$sql = "select a.id, a.name_zh, a.address,b.url,b.id,
+				(select count(*) from qcgj_brand_mall where tb_mall_id = a.id) as mall_count from qcgj_mall as a
+				left join tb_fetch_shopmall_detail as b on b.address_s = a.address
+				order by a.name_zh ASC";
+		$brandList = $this->query($sql);
+
+		$newBrandList = array();
+		foreach ($brandList as $k => $v) {
+			preg_match_all('/\d+/', $v['url'], $brandID);
+			$v['url'] = '<a href="http://m.dianping.com/shop/'.$brandID[0][0].'" target="_blank">m.dianing.com/shop/'.$brandID[0][0].'</a>';
+
+			if ($v['mall_count'] <= 0) {
+				array_unshift($newBrandList, $v);
+			}else{
+				array_push($newBrandList, $v);
+			}
+		}
+
+		return $newBrandList;
 	}
 
 	/**
