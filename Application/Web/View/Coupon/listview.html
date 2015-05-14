@@ -2,6 +2,9 @@
 
 		<link rel="stylesheet" href="{:C('WEB_HTML_PATH')}css/ace-skins.min.css" />
 
+		<link rel="stylesheet" href="{:C('WEB_HTML_PATH')}css/jquery-ui-1.10.3.full.min.css" />
+
+
 		<!--[if lte IE 8]>
 		  <link rel="stylesheet" href="{:C('WEB_HTML_PATH')}css/ace-ie.min.css" />
 		<![endif]-->
@@ -79,10 +82,11 @@
 															</label>
 														</th>
 														<th>{:L('TEXT_COUPON_NAME')}</th>
-														<th>{:L('TEXT_COUPON_CODE')}</th>
 														<th>{:L('TEXT_COUPON_EXPIRE_DATE')}</th>
 														<th>{:L('TEXT_COUPON_STATUS')}</th>
-														<th>Status</th>
+														<th>{:L('TEXT_COUPON_SHOPCOUNT')}</th>
+														<th>{:L('TEXT_COUPON_RECEIVECOUNT')}</th>
+														<th>{:L('TEXT_COUPON_USECOUNT')}</th>
 														<th>{:L('TEXT_COUPON_OPERATION')}</th>
 													</tr>
 												</thead>
@@ -160,6 +164,7 @@
 													</tr>
 												</volist>
 												</tbody> -->
+
 											</table>
 										</div>
 									</div>
@@ -180,6 +185,7 @@
 		<!--[if !IE]> -->
 
 		<script src="{:C('WEB_HTML_PATH')}js/jquery.min.js"></script>
+		<script type="text/javascript" src="{:C('WEB_HTML_PATH')}js/jquery-ui-1.10.3.full.min.js"></script>
 
 		<!-- <![endif]-->
 
@@ -209,7 +215,9 @@
 
 		<!-- page specific plugin scripts -->
 
-		<script src="{:C('WEB_HTML_PATH')}js/jquery.dataTables.min.js"></script>
+		<!--  <script src="{:C('WEB_HTML_PATH')}js/jquery.dataTables.min.js"></script> -->
+
+		<script src="{:C('WEB_HTML_PATH')}js/datatables_1_10_7.js"></script>
 		<script src="{:C('WEB_HTML_PATH')}js/jquery.dataTables.bootstrap.js"></script>
 
 		<!-- ace scripts -->
@@ -221,6 +229,7 @@
 
 		<script type="text/javascript">
 			jQuery(function($) {
+
 				// var oTable1 = $('#sample-table-2').dataTable( {
 				// "aoColumns": [
 			 //      { "bSortable": false },
@@ -229,9 +238,14 @@
 				// ] } );
 
 				var oTable1 = $('#sample-table-2').dataTable({
-					'bServerSide': true,
-					// 'serverSid' : true,
-					'sAjaxSource' : '<?php echo U("Coupon/ajaxCouponList");?>'
+
+		            "processing": true,
+		            "serverSide": true,
+		            "ajax": '<?php echo U("Coupon/ajaxCouponList");?>',
+					"aoColumns": [
+				      { "bSortable": false },
+				      null, null,null, null, null,null,
+					  { "bSortable": false }]
 				});
 
 
@@ -259,6 +273,15 @@
 					if( parseInt(off2.left) < parseInt(off1.left) + parseInt(w1 / 2) ) return 'right';
 					return 'left';
 				}
+
+				$( "#Startdatepicker" ).datepicker({
+					showOtherMonths: true,
+					selectOtherMonths: false
+				});
+				$( "#Enddatepicker" ).datepicker({
+					showOtherMonths: true,
+					selectOtherMonths: false
+				});
 			})
 		</script>
 	</body>
