@@ -14,7 +14,7 @@ class CouponModel extends Model{
 	 * @param string $search 搜索关键词
 	 * @param string $fileType 数据输出类型 DT=dataTable
 	 */
-	public function getCoupon($pageStart = 0, $pageLength = 10, $search = false, $fileType = 'DT'){
+	public function getCouponList($pageStart = 0, $pageLength = 10, $search = false, $fileType = 'DT'){
 
 		$field = "name, CONCAT(LEFT(begin_date, 10), '至', LEFT(end_date, 10)) AS times, status";
 

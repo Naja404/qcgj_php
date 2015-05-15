@@ -1,16 +1,16 @@
 <?php
 /**
- * 优惠券模块
+ * 商户模块
  */
 namespace Web\Controller;
 use Think\Controller;
 
-class CouponController extends WebController {
+class ShopController extends WebController {
 
-	public $couponModel;
+	public $ShopModel;
 
 	public function _initialize(){
-		$this->couponModel = D('Coupon');
+		$this->ShopModel = D('Shop');
 		$this->_assignText();
 	}
 
@@ -19,17 +19,9 @@ class CouponController extends WebController {
 	}
 
 	/**
-	 * 优惠券列表
+	 * 商户列表
 	 */
 	public function listview(){
-		$this->display();
-	}
-
-	/**
-	 * 优惠券报表
-	 *
-	 */
-	public function analysis(){
 		$this->display();
 	}
 
@@ -37,13 +29,13 @@ class CouponController extends WebController {
 	 * ajax获取内容
 	 *
 	 */
-	public function ajaxCouponList(){
+	public function ajaxShopList(){
 
 		$pageLength = I('get.length');
 		$pageStart  = (I('get.start') / $pageLength) + 1;
 		$search     = I('get.search');
 
-		$data = $this->couponModel->getCouponList($pageStart, $pageLength, $search['value'], 'DT');
+		$data = $this->ShopModel->getShopList($pageStart, $pageLength, $search['value'], 'DT');
 
 		$this->ajaxReturn($data);
 	}
@@ -52,6 +44,6 @@ class CouponController extends WebController {
 	 * 变量定义
 	 */
 	private function _assignText(){
-		$this->assign('pageTitle', L('TEXT_COUPON_TITLE_'.ACTION_NAME));
+		$this->assign('pageTitle', L('TEXT_SHOP_TITLE_'.ACTION_NAME));
 	}
 }

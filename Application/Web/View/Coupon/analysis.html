@@ -1,0 +1,183 @@
+<include file="Public/header" />
+		<link rel="stylesheet" href="{:C('WEB_HTML_PATH')}css/ace-skins.min.css" />
+
+		<!--[if lte IE 8]>
+		  <link rel="stylesheet" href="{:C('WEB_HTML_PATH')}css/ace-ie.min.css" />
+		<![endif]-->
+
+		<!-- inline styles related to this page -->
+
+		<!-- ace settings handler -->
+
+		<script src="{:C('WEB_HTML_PATH')}js/ace-extra.min.js"></script>
+
+		<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+
+		<!--[if lt IE 9]>
+		<script src="{:C('WEB_HTML_PATH')}js/html5shiv.js"></script>
+		<script src="{:C('WEB_HTML_PATH')}js/respond.min.js"></script>
+		<![endif]-->
+	</head>
+
+	<body>
+		<include file="Public:navbar" />
+
+		<div class="main-container" id="main-container">
+			<script type="text/javascript">
+				try{ace.settings.check('main-container' , 'fixed')}catch(e){}
+			</script>
+
+			<div class="main-container-inner">
+				<a class="menu-toggler" id="menu-toggler" href="#">
+					<span class="menu-text"></span>
+				</a>
+
+				<include file="Public:sidebar" />
+
+				<div class="main-content">
+					<div class="breadcrumbs" id="breadcrumbs">
+						<script type="text/javascript">
+							try{ace.settings.check('breadcrumbs' , 'fixed')}catch(e){}
+						</script>
+
+						<ul class="breadcrumb">
+							<li>
+								<i class="icon-home home-icon"></i>
+								<a href="{:C('WEBSITE_URL')}">{:L('TEXT_HOME_PAGE')}</a>
+							</li>
+							<li class="active">{:L('TEXT_COUPON_TITLE_ANALYSIS')}</li>
+						</ul><!-- .breadcrumb -->
+					</div>
+
+					<div class="page-content">
+						<div class="page-header">
+							<h1>
+								{:L('TEXT_COUPON_MANAGER')}
+								<small>
+									<i class="icon-double-angle-right"></i>
+									{:L('TEXT_COUPON_TITLE_ANALYSIS')}
+								</small>
+							</h1>
+						</div><!-- /.page-header -->
+
+								<div class="row">
+
+									<div class="col-sm-7">
+										<div class="widget-box transparent">
+											<div class="widget-header widget-header-flat">
+												<h4 class="lighter">
+													<i class="icon-signal"></i>
+													{:L('TEXT_COUPON_TITLE_ANALYSIS')}
+												</h4>
+
+												<div class="widget-toolbar">
+													<a href="#" data-action="collapse">
+														<i class="icon-chevron-up"></i>
+													</a>
+												</div>
+											</div>
+
+											<div class="widget-body">
+												<div class="widget-main padding-4">
+													<canvas id="canvas"></canvas>
+												</div><!-- /widget-main -->
+											</div><!-- /widget-body -->
+										</div><!-- /widget-box -->
+									</div>
+								</div>
+
+								<div class="hr hr32 hr-dotted"></div>
+
+								<!-- PAGE CONTENT ENDS -->
+							</div><!-- /.col -->
+						</div><!-- /.row -->
+					</div><!-- /.page-content -->
+				</div><!-- /.main-content -->
+
+			</div><!-- /.main-container-inner -->
+
+			<a href="#" id="btn-scroll-up" class="btn-scroll-up btn btn-sm btn-inverse">
+				<i class="icon-double-angle-up icon-only bigger-110"></i>
+			</a>
+		</div><!-- /.main-container -->
+
+		<!-- basic scripts -->
+
+		<!--[if !IE]> -->
+
+		<script src="{:C('WEB_HTML_PATH')}js/jquery.min.js"></script>
+
+		<!-- <![endif]-->
+
+		<!--[if !IE]> -->
+
+		<script type="text/javascript">
+			window.jQuery || document.write("<script src='{:C('WEB_HTML_PATH')}js/jquery-2.0.3.min.js'>"+"<"+"/script>");
+		</script>
+
+		<!-- <![endif]-->
+
+		<!--[if IE]>
+<script type="text/javascript">
+ window.jQuery || document.write("<script src='{:C('WEB_HTML_PATH')}js/jquery-1.10.2.min.js'>"+"<"+"/script>");
+</script>
+<![endif]-->
+
+		<script type="text/javascript">
+			if("ontouchend" in document) document.write("<script src='{:C('WEB_HTML_PATH')}js/jquery.mobile.custom.min.js'>"+"<"+"/script>");
+		</script>
+		<script src="{:C('WEB_HTML_PATH')}js/bootstrap.min.js"></script>
+		<script src="{:C('WEB_HTML_PATH')}js/typeahead-bs2.min.js"></script>
+
+		<script src="{:C('WEB_HTML_PATH')}js/Chart.min.js"></script>
+
+		<!-- page specific plugin scripts -->
+
+		<!--[if lte IE 8]>
+		  <script src="{:C('WEB_HTML_PATH')}js/excanvas.min.js"></script>
+		<![endif]-->
+
+		<!-- ace scripts -->
+
+		<script src="{:C('WEB_HTML_PATH')}js/ace-elements.min.js"></script>
+		<script src="{:C('WEB_HTML_PATH')}js/ace.min.js"></script>
+
+		<!-- inline scripts related to this page -->
+
+		<script type="text/javascript">
+			var randomScalingFactor = function(){ return Math.round(Math.random()*100)};
+			var lineChartData = {
+				labels : ["January","February","March","April","May","June","July"],
+				datasets : [
+					{
+						label: "My First dataset",
+						fillColor : "rgba(220,220,220,0.2)",
+						strokeColor : "rgba(220,220,220,1)",
+						pointColor : "rgba(220,220,220,1)",
+						pointStrokeColor : "#fff",
+						pointHighlightFill : "#fff",
+						pointHighlightStroke : "rgba(220,220,220,1)",
+						data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+					},
+					{
+						label: "My Second dataset",
+						fillColor : "rgba(151,187,205,0.2)",
+						strokeColor : "rgba(151,187,205,1)",
+						pointColor : "rgba(151,187,205,1)",
+						pointStrokeColor : "#fff",
+						pointHighlightFill : "#fff",
+						pointHighlightStroke : "rgba(151,187,205,1)",
+						data : [randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor(),randomScalingFactor()]
+					}
+				]
+
+			}
+			jQuery(function($) {
+				var ctx = document.getElementById("canvas").getContext("2d");
+				window.myLine = new Chart(ctx).Line(lineChartData, {
+					responsive: true
+				});
+			})
+		</script>
+	</body>
+<include file="Public/footer" />
