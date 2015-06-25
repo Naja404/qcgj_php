@@ -23,4 +23,12 @@ return array(
 	'TEXT_PLACEHOLDER_RULE_ACTION_URL'   => '如:Web/Coupon/listview',
 	'TEXT_PLACEHOLDER_RULE_SORT'         => '数字越大排序越高',
 
+	'ERR_RULE_MODULE' => '模块错误或为空',
+	'ERR_RULE_MODULE_TITLE' => '模块名错误或为空',
+	'ERR_RULE_ACTION_TITLE' => '操作标题错误或为空',
+	'ERR_RULE_ACTION_URL' => '操作URL错误或为空',
+	'ERR_RULE_SORT' => '排序错误或为空',
+	'ERR_RULE_TYPE' => '类型错误或为空',
+
+
 		);

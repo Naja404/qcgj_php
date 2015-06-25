@@ -252,7 +252,6 @@ class Model {
      * @return boolean
      */
      protected function _facade($data) {
-
         // 检查数据字段合法性
         if(!empty($this->fields)) {
             if(!empty($this->options['field'])) {
@@ -309,8 +308,10 @@ class Model {
                 return false;
             }
         }
+
         // 数据处理
         $data       =   $this->_facade($data);
+
         // 分析表达式
         $options    =   $this->_parseOptions($options);
         if(false === $this->_before_insert($data,$options)) {
@@ -991,6 +992,8 @@ class Model {
      * @return mixed
      */
      public function create($data='',$type='') {
+        echo '<pre>';
+        print_r($this);exit;
         // 如果没有传值默认取POST数据
         if(empty($data)) {
             $data   =   I('post.');

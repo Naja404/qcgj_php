@@ -41,13 +41,28 @@ class RoleController extends WebController {
 	 */
 	public function addrule(){
 
-		if (!IS_AJAX) {
-			$this->ajaxReturn($this->ajaxRes);
-		}
+		// if (!IS_AJAX) {
+		// 	$this->ajaxReturn($this->ajaxRes);
+		// }
 
 		$ruleData = I('post.');
+		$ruleData = array(
+				'module' => 'Coupon',
+				'module_title' =>'优惠券管理',
+			);
 
 		$result = $this->roleModel->addRule($ruleData);
+
+		if ($result === true) {
+			$this->ajaxRes = array(
+					'status' => 0,
+					'msg'    => L('TEXT_RULE_ADD_SUCCESS'),
+				);
+		}else{
+			$this->ajaxRes['msg'] = $result;
+		}
+
+		$this->ajaxReturn($this->ajaxRes);
 	}
 
 	/**
