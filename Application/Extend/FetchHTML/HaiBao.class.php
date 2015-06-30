@@ -7,7 +7,7 @@ require_once(dirname(__FILE__).'/../phpQuery.class.php');
 class HaiBao {
 	
 	public function __construct($filePath){
-		phpQuery::newDocumentFile($filePath); 
+		phpQuery::newDocumentHTML($filePath); 
 	}
 
 	/**
@@ -15,10 +15,20 @@ class HaiBao {
 	 *
 	 */
 	public function splitLogo(){
-		$what = pq('.sort-list')->find('a')->attr('href');
+		
+		$logo = array();
 
-		echo '<pre>';
-		print_r($what);exit;
+		foreach (pq('.b-border.margin-10')->find('a') as $k => $v) {
+			$name = preg_replace('/<img(.*)alt="">/', '', pq($v)->html());
+			$name = explode('<br>', $name);
+			$logo[] = array(
+					'name_en'  => trim($name[0]),
+					'name_zh' => trim($name[1]),
+					'image' => pq($v)->find('img')->attr('src'),
+				);
+		}
+
+		return $logo;
 	}
 }
 
