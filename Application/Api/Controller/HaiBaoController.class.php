@@ -26,6 +26,37 @@ class HaiBaoController extends ApiController {
         $this->_initSnoopy();
     }
 
+    public function getFile(){
+        $address = file('/Users/hisoka/WorkSpace/XinYi/qcgj_php/shanghaiMallAddress');
+        $mallen = file('/Users/hisoka/WorkSpace/XinYi/qcgj_php/shanghaiMallZh.php');
+        $mallzh = file('/Users/hisoka/WorkSpace/XinYi/qcgj_php/shanghaiMallEn.php');
+        $floor = file('/Users/hisoka/WorkSpace/XinYi/qcgj_php/shanghaiMallFloor');
+        $mall = file('/Users/hisoka/WorkSpace/XinYi/qcgj_php/shanghaiMall.php');
+        
+        foreach ($mall as $key => $value) {
+
+            if (!empty($mallzh[$key])) {
+                $id = $this->haibaoModel->table('tb_brand')->where(array('name_zh' => $mallzh[$key]))->getField('id');
+                $mallId = $this->haibaoModel->table('tb_brand_mall')->where(array('tb_brand_id' => $id))->getField('tb_mall_id');
+
+                $hasId = $this->haibaoModel->table('tb_mall')->where(array('id' => $mallId))->getField('id');
+
+                if ($hasId) {
+                    echo $mallzh[$key];exit;
+                }
+            }
+        }
+    }
+
+    public function setBrand(){
+        $text = @file_get_contents('/Users/hisoka/Desktop/brand_tag.txt');
+
+        $text = explode(';', $text);
+
+        echo '<pre>';
+        print_r($text);exit;
+    }
+
     /**
      * 设置logo list
      *

@@ -25,9 +25,14 @@ class MovieModel extends Model{
 
 	/**
 	 * 获取电影院列表
-	 *
+	 * @param array $where  条件
 	 */
-	public function getCinemaList(){
+	public function getCinemaList($where = array()){
+		
+		if (count($where)) {
+			return $this->where($where)->select();
+		}
+		
 		return $this->select();
 	}
 

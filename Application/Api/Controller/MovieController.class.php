@@ -30,10 +30,13 @@ class MovieController extends ApiController {
      *
      */
     public function setGewaraImage(){
-        $list = $this->movieModel->getCinemaList();
+        $where = array(
+                'area' => '长宁区',
+            );
+        $list = $this->movieModel->getCinemaList($where);
 
         foreach ($list as $k => $v) {
-            cacheList('Gewara', $v);
+            cacheList('Gewara_img', $v);
         }
     }
 
@@ -45,9 +48,9 @@ class MovieController extends ApiController {
 
         $cache = cacheList('Gewara');
 
-        preg_match('/\w+.jpg/', $cache['image'], $imageName);
+        // preg_match('/\w+.jpg/', $cache['image'], $imageName);
 
-        $this->_downloadImage($cache['image'], C('FETCH_INFO.FILE_PATH').'movie/logo/'.$imageName[0]);
+        // $this->_downloadImage($cache['image'], C('FETCH_INFO.FILE_PATH').'movie/logo/'.$imageName[0]);
 
         $imageArr = json_decode($cache['text'], true);
         
@@ -55,7 +58,7 @@ class MovieController extends ApiController {
 
         foreach ($imageArr['img'] as $k => $v) {
             preg_match('/\w+.jpg/', $v, $imageName);
-            $this->_downloadImage($url.$v, C('FETCH_INFO.FILE_PATH').'movie/image/'.$imageName[0]);
+            $this->_downloadImage($url.$v, C('FETCH_INFO.FILE_PATH').'movie/'.$cache['id'].'/image/'.$imageName[0]);
         }
     }
 

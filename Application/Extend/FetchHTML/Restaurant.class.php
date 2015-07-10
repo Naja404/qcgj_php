@@ -11,6 +11,41 @@ class Restaurant {
 	}
 
 	/**
+	 * 获取图片url
+	 *
+	 */
+	public function getRestaurantImg(){
+
+		$img = array();
+
+		foreach (pq('.picture-list')->find('li') as $k => $v) {
+			$img[] = pq($v)->find('img')->attr('src');
+		}
+
+		return $img;
+	}
+
+	/**
+	 * 获取图片url other
+	 *
+	 */
+	public function getRestaurantImgOther(){
+
+		$img = array();
+
+		foreach (pq('')->find('li') as $k => $v) {
+
+			$tmp = pq($v)->find('img')->attr('src');
+
+			if (!empty($tmp)) {
+				$img[] = $tmp;
+			}
+		}
+
+		return $img;
+	}
+
+	/**
 	 * 获取餐厅详细页url
 	 *
 	 */
@@ -37,11 +72,17 @@ class Restaurant {
 
 		$name = pq('.shop-name')->text();
 
+		$image = pq('.pic-txt')->find('img')->attr('src');
+
+		if (!$image) $image = pq('.new_pic')->find('img')->attr('src');
+
+		$address = preg_replace('/\s+/', '', $arr[0][0]);
+
 		$detail = array(
-				'name'    => $name[0],
-				'address' => preg_replace('/\s+/', '', $arr[0][0]),
-				'tel'     => trim($arr[1][0]),
-				'image' => pq('.pic-txt')->find('img')->attr('src'),
+				'name'    => trim($name[0]),
+				'address' => $address,
+				'tel'     => is_numeric(trim($arr[1][0])) ? trim($arr[1][0]) : trim($arr[2][0]),
+				'image' => $image,
 			);
 
 		return $detail;

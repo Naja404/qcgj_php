@@ -26,13 +26,55 @@ class RestaurantController extends ApiController {
     }
 
     /**
+     * 设置餐厅url
+     *
+     */
+    public function getRestaurantList(){
+
+        $detail = cacheList('dianping_detail');
+
+        $base = "http://www.dianping.com".$detail['url'].'/photos/tag'.urlencode('-环境-门面');
+
+        $res = $this->snoopy->fetch($base);
+
+        $imgUrl = $this->fetch->fetch($res->results, "getRestaurantImg");
+
+        if (count($imgUrl) <= 0) {
+            $base = "http://www.dianping.com".$detail['url'].'/photos/tag'.urlencode('-环境');
+
+            $res = $this->snoopy->fetch($base);
+
+            $imgUrl = $this->fetch->fetch($res->results, "getRestaurantImgOther");
+
+        }
+
+        $newImg = array();
+
+        foreach ($imgUrl as $k => $v) {
+            $newImg[] = preg_replace('/\(.*\)/', '(700x700)', $v);
+        }
+
+        unset($detail['id']);
+
+        $detail['pic'] = json_encode($newImg);
+        $detail['mark'] = 1;
+
+        $insertRes = $this->restaurantModel->add($detail);
+
+        if (!$insertRes) {
+            cacheList('dianping_fail', $detail);
+        }
+    }
+
+    /**
      * 获取餐厅内容
      *
      */
     public function getRestaurant(){
 
-        // $url = cacheList('dianping');
-        $url = "shop/18615887";
+        $url = cacheList('dianping');
+
+        cacheList('dianping_back_url', $url);
 
         $getUrl = 'http://m.dianping.com'.$url;
 
@@ -41,11 +83,11 @@ class RestaurantController extends ApiController {
         $detail = $this->fetch->fetch($fetchRes->results, 'getRestaurant');
 
         $detail['url'] = $url;
-        echo '<pre>';
-        print_r($detail);exit;
-        $this->restaurantModel->add($detail);
 
-        cacheList('dianping_back', $url);
+        $status = $this->restaurantModel->add($detail);
+
+
+        cacheList('dianping_back', $detail);
     }
 
     /**
@@ -90,7 +132,7 @@ class RestaurantController extends ApiController {
         $this->snoopy->cookies['m_flash2'] = 1;
         $this->snoopy->cookies['pvhistory'] = '5ZWG5oi3Pjo8L3Nob3BsaXN0LzEvci80L2MvMTAvcy9zXy0xPjo8MTQzNTY1MjQ5NDc3MV1fW+i/lOWbnj46PC9hamF4L2dldExvY2F0aW9uSW5mbz9jYWxsYmFjaz1qc29ucDE+OjwxNDM1NjUyNTA1NTI3XV9b';
         $this->snoopy->cookies['testName'] = 'test2';
-        $this->snoopy->host = 'm.dianping.com';
+        $this->snoopy->host = 'www.dianping.com';
         $this->snoopy->agent = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/42.0.2311.90 Safari/537.36';
     }
 
